@@ -1,0 +1,100 @@
+"use client";
+
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { ChangeEventHandler, FormEventHandler, useState } from "react";
+import styles from "./login.module.css";
+
+export default function LoginModal() {
+  const router = useRouter();
+  const [id, setId] = useState("");
+  const [password, setPassword] = useState("");
+  const [message, setMessage] = useState("");
+  const onSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
+    e.preventDefault();
+    setMessage("");
+    try {
+      const result = await signIn("credentials", {
+        username: id, //next-auth에서 이름 고정
+        password,
+        redirect: false,
+      });
+      console.log(result);
+      if (result?.code === "no_user") {
+        setMessage("가입하지 않은 유저입니다.");
+      } else if (result?.code === "wrong_password") {
+        setMessage("비밀번호가 틀렸습니다.");
+      }
+      router.replace("/home");
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  const onClickClose = () => {
+    router.back();
+  };
+  const onChangeId: ChangeEventHandler<HTMLInputElement> = (e) => {
+    setId(e.target.value);
+  };
+  const onChangePassword: ChangeEventHandler<HTMLInputElement> = (e) => {
+    setPassword(e.target.value);
+  };
+
+  return (
+    <div className={styles.modalBackground}>
+      <div className={styles.modal}>
+        <div className={styles.modalHeader}>
+          <button className={styles.closeButton} onClick={onClickClose}>
+            <svg
+              width={24}
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+              className="r-18jsvk2 r-4qtqp9 r-yyyyoo r-z80fyv r-dnmrzs r-bnwqim r-1plcrui r-lrvibr r-19wmn03"
+            >
+              <g>
+                <path d="M10.59 12L4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"></path>
+              </g>
+            </svg>
+          </button>
+          <div>로그인하세요</div>
+        </div>
+        <form onSubmit={onSubmit}>
+          <div className={styles.modalBody}>
+            <div className={styles.inputDiv}>
+              <label className={styles.inputLabel} htmlFor="id">
+                아이디
+              </label>
+              <input
+                id="id"
+                className={styles.input}
+                value={id}
+                onChange={onChangeId}
+                type="text"
+                placeholder=""
+              />
+            </div>
+            <div className={styles.inputDiv}>
+              <label className={styles.inputLabel} htmlFor="password">
+                비밀번호
+              </label>
+              <input
+                id="password"
+                className={styles.input}
+                value={password}
+                onChange={onChangePassword}
+                type="password"
+                placeholder=""
+              />
+            </div>
+          </div>
+          <div className={styles.message}>{message}</div>
+          <div className={styles.modalFooter}>
+            <button className={styles.actionButton} disabled={!id && !password}>
+              로그인하기
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}

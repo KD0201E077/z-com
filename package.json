@@ -1,0 +1,43 @@
+{
+  "name": "z-com",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build --turbopack",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@auth/core": "^0.40.0",
+    "@faker-js/faker": "^10.0.0",
+    "@tanstack/react-query": "^5.87.1",
+    "class": "^0.1.4",
+    "classnames": "^2.5.1",
+    "clsx": "^2.1.1",
+    "dayjs": "^1.11.18",
+    "next": "15.5.2",
+    "next-auth": "^5.0.0-beta.29",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-intersection-observer": "^9.16.0",
+    "react-textarea-autosize": "^8.5.9",
+    "zustand": "^5.0.8"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@tanstack/react-query-devtools": "^5.87.1",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.5.2",
+    "msw": "^2.11.1",
+    "typescript": "^5"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
+  }
+}
