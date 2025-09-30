@@ -86,7 +86,10 @@ export default function ActionButtons({ white, post }: Props) {
             if (value.postId === postId) {
               const shallow = {
                 ...value,
-                Hearts: [{ userId: session?.user?.email as string }],
+                Hearts: [
+                  ...value.Hearts,
+                  { userId: session?.user?.email as string },
+                ],
                 _count: {
                   ...value._count,
                   Hearts: value._count.Hearts + 1,
@@ -256,7 +259,7 @@ export default function ActionButtons({ white, post }: Props) {
                 Hearts: [
                   ...shallow.pages[pageIndex][index].Hearts,
                   { userId: session?.user?.email as string },
-                ], //<-추가 맞음????
+                ],
                 _count: {
                   ...shallow.pages[pageIndex][index]._count,
                   Hearts: shallow.pages[pageIndex][index]._count.Hearts + 1,
@@ -269,7 +272,10 @@ export default function ActionButtons({ white, post }: Props) {
             if (value.postId === postId) {
               const shallow = {
                 ...value,
-                Hearts: [{ userId: session?.user?.email as string }],
+                Hearts: [
+                  ...value.Hearts,
+                  { userId: session?.user?.email as string },
+                ],
                 _count: {
                   ...value._count,
                   Hearts: value._count.Hearts + 1,

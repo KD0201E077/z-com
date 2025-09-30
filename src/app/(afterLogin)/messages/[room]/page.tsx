@@ -1,82 +1,37 @@
-import clsx from "clsx";
-import dayjs from "dayjs";
+import { auth } from "@/auth";
+import { QueryClient } from "@tanstack/react-query";
 import "dayjs/locale/ko";
-import relativeTime from "dayjs/plugin/relativeTime";
-import Link from "next/link";
-import BackButton from "../../_component/BackButton";
+import { getUserServer } from "../../[username]/_lib/getUserServer";
+import MessageForm from "./_component/MessageForm";
+import MessageList from "./_component/MessageList";
+import UserInfo from "./_component/UserInfo";
+import WebSocketComponent from "./_component/WebSocketComponent";
 import style from "./chatRoom.module.css";
 
-dayjs.locale("ko");
-dayjs.extend(relativeTime);
+type Props = {
+  params: Promise<{ room: string }>;
+};
 
-export default function ChatRoom() {
-  const user = {
-    id: "hero",
-    nickname: "영웅",
-    image: `https://picsum.photos/640/480?random=${Math.floor(
-      Math.random() * 1000
-    )}`,
-  };
-  const messages = [
-    {
-      messageId: 1,
-      roomId: 123,
-      id: "zerocho0",
-      content: "안녕하세요",
-      createdAt: new Date(),
-    },
-    {
-      messageId: 2,
-      roomId: 123,
-      id: "hero",
-      content: "안녕하세요2",
-      createdAt: new Date(),
-    },
-  ];
+export default async function ChatRoom({ params }: Props) {
+  const { room } = await params;
+  const session = await auth();
+  const queryClient = new QueryClient();
+  const ids = room.split("-").filter((v) => v !== session?.user?.email);
+
+  if (!ids[0]) {
+    return null;
+  }
+  await queryClient.prefetchQuery({
+    queryKey: ["users", ids[0]],
+    queryFn: getUserServer,
+  });
 
   return (
     <main className={style.main}>
-      <div className={style.header}>
-        <BackButton />
-        <div>
-          <h2>{user.nickname}</h2>
-        </div>
-      </div>
-      <Link href={user.nickname} className={style.userInfo}>
-        <img src={user.image} alt={user.id} />
-        <div>
-          <b>{user.nickname}</b>
-        </div>
-        <div>@{user.id}</div>
-      </Link>
-      <div className={style.list}>
-        {messages.map((m) => {
-          if (m.id === "zerocho0") {
-            return (
-              <div
-                key={m.messageId}
-                className={clsx(style.message, style.myMessage)}
-              >
-                <div className={style.content}>{m.content}</div>
-                <div className={style.date}>
-                  {dayjs(m.createdAt).format("YYYY년 MM월 DD일 A HH시 mm분")}
-                </div>
-              </div>
-            );
-          }
-          return (
-            <div
-              key={m.messageId}
-              className={clsx(style.message, style.yourMessage)}
-            >
-              <div className={style.content}>{m.content}</div>
-              <div className={style.date}>
-                {dayjs(m.createdAt).format("YYYY년 MM월 DD일 A HH시 mm분")}
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      <WebSocketComponent />
+      <UserInfo id={ids[0]} />
+      <MessageList id={ids[0]} />
+      <MessageForm id={ids[0]} />
     </main>
   );
 }

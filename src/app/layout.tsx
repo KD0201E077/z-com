@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import { ReactNode } from "react";
 import AuthSession from "./_component/AuthSession";
 import { MSWProvider } from "./_component/MSWComponent";
+// import "./globalTheme
 import "./globals.css";
 
 if (

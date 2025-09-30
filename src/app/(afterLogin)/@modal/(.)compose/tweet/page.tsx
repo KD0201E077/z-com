@@ -1,5 +1,6 @@
 "use client";
 
+import { HandleImageUpload } from "@/app/(afterLogin)/_utils/imageUploader";
 import { Post } from "@/model/Post";
 import { useModalStore } from "@/store/modal";
 import {
@@ -149,7 +150,10 @@ export default function TweetModal() {
               value.pages[pageIndex] = [...value.pages[pageIndex]];
               shallow.pages[pageIndex][index] = {
                 ...shallow.pages[pageIndex][index],
-                Comments: [{ userId: me?.user?.email as string }],
+                Comments: [
+                  ...shallow.pages[pageIndex][index].Comments,
+                  { userId: me?.user?.email as string },
+                ],
                 _count: {
                   ...shallow.pages[pageIndex][index]._count,
                   Comments: shallow.pages[pageIndex][index]._count.Comments + 1,
@@ -163,7 +167,10 @@ export default function TweetModal() {
             if (value.postId === parent?.postId) {
               const shallow = {
                 ...value,
-                Comments: [{ userId: me?.user?.email as string }],
+                Comments: [
+                  ...value.Comments,
+                  { userId: me?.user?.email as string },
+                ],
                 _count: {
                   ...value._count,
                   Comments: value._count.Comments + 1,
@@ -206,21 +213,10 @@ export default function TweetModal() {
 
   const onUpload: ChangeEventHandler<HTMLInputElement> = (e) => {
     e.preventDefault();
-    if (e.target.files) {
-      Array.from(e.target.files).forEach((file, index) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setPreview((prevPreview) => {
-            const prev = [...prevPreview];
-            prev[index] = {
-              dataUrl: reader.result as string,
-              file,
-            };
-            return prev;
-          });
-        };
-        reader.readAsDataURL(file);
-      });
+    HandleImageUpload(e.target.files, setPreview);
+    if (imageRef.current) {
+      //같은걸 연속으로 선택할 수 있게끔
+      imageRef.current.value = "";
     }
   };
 

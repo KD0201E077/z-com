@@ -1,11 +1,10 @@
 "use client";
 
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { useActionState, useEffect, useRef } from "react";
+import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import onSubmit from "../_lib/signup";
 import BackButton from "./BackButton";
+// import * as style from "./signup.css";
 import style from "./signup.module.css";
 
 function showMessage(message: string | null | undefined) {
@@ -27,7 +26,7 @@ function showMessage(message: string | null | undefined) {
   if (message === "nickname must be a string") {
     return "닉네임이 필요합니다.";
   }
-  return message;
+  return "";
 }
 
 export default function SignupModal() {
@@ -35,20 +34,7 @@ export default function SignupModal() {
     message: null,
   });
   const { pending } = useFormStatus();
-  const { update } = useSession(); //세션 업데이트
-  const router = useRouter();
-  const hasRedirected = useRef(false);
 
-  useEffect(() => {
-    if (state.success && !hasRedirected.current) {
-      hasRedirected.current = true;
-      console.log("회원가입 성공, 세션 업데이트 중...");
-      update().then(() => {
-        console.log("세션 업데이트 완료, 홈으로 이동");
-        router.push("/home");
-      });
-    }
-  }, [state.success]);
   return (
     <>
       <div className={style.modalBackground}>
@@ -70,7 +56,6 @@ export default function SignupModal() {
                   type="text"
                   placeholder=""
                   required
-                  defaultValue={state.id as string}
                 />
               </div>
               <div className={style.inputDiv}>
@@ -84,7 +69,6 @@ export default function SignupModal() {
                   type="text"
                   placeholder=""
                   required
-                  defaultValue={state.nickname as string}
                 />
               </div>
               <div className={style.inputDiv}>
@@ -98,7 +82,6 @@ export default function SignupModal() {
                   type="password"
                   placeholder=""
                   required
-                  defaultValue={state.password as string}
                 />
               </div>
               <div className={style.inputDiv}>
@@ -112,7 +95,6 @@ export default function SignupModal() {
                   type="file"
                   accept="image/*"
                   required
-                  defaultValue={state.image as string}
                 />
               </div>
             </div>

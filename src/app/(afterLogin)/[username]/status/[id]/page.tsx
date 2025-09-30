@@ -24,6 +24,24 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `Z에서 ${user.nickname} 님 : ${post.content}`,
     description: post.content,
+    openGraph: {
+      title: `${user.nickname} (${user.id}) / Z`,
+      description: `${user.nickname} (${user.id}) 프로필`,
+      images:
+        post.Images?.length > 0
+          ? post.Images?.map((v) => ({
+              url: `https://localhost:3000${v.link}`,
+              width: 600,
+              height: 400,
+            }))
+          : [
+              {
+                url: `https://localhost:3000${user.image}`,
+                width: 400,
+                height: 400,
+              },
+            ],
+    },
   };
 }
 
@@ -38,9 +56,10 @@ export default async function Page({ params }: Props) {
     queryKey: ["posts", id],
     queryFn: getSinglePostServer,
   });
-  await queryClient.prefetchQuery({
+  await queryClient.prefetchInfiniteQuery({
     queryKey: ["posts", id, "comments"],
     queryFn: getComments,
+    initialPageParam: 0,
   });
   const dehydratedState = dehydrate(queryClient);
   return (

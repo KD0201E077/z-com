@@ -1,6 +1,7 @@
 "use server";
 
 import { signIn } from "@/auth";
+import { redirect } from "next/navigation";
 
 export default async (
   prevState: { message: string | null },
@@ -35,15 +36,8 @@ export default async (
     console.log(response.status);
     if (response.status === 403) {
       return { message: "user_exists" };
-    } else if (response.status === 400) {
-      return {
-        message: (await response.json()).data[0],
-        id: formData.get("id"),
-        nickname: formData.get("nickname"),
-        password: formData.get("password"),
-        image: formData.get("image"),
-      };
     }
+
     console.log(await response.json());
     shouldRedirect = true;
     await signIn("credentials", {
@@ -51,13 +45,12 @@ export default async (
       password: formData.get("password"),
       redirect: false,
     });
-    return { message: null, success: true };
   } catch (err) {
     console.error(err);
     return { message: null };
   }
-  // if (shouldRedirect) {
-  //   redirect("/home"); //try catch문 안에서 사용x
-  // }
+  if (shouldRedirect) {
+    redirect("/home"); //try catch문 안에서 사용x
+  }
   return { message: null };
 };

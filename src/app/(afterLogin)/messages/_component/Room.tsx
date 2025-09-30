@@ -1,37 +1,34 @@
 "use client";
 
+import { Room as IRoom } from "@/model/Room";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import style from "../message.module.css";
 
 dayjs.locale("ko");
 dayjs.extend(relativeTime);
 
-export default function Room() {
-  const user = {
-    id: "hero",
-    nickname: "영웅",
-    Messages: [
-      { roomId: 123, content: "안녕하세요", createdAt: new Date() },
-      { roomId: 123, content: "안녕하세요2", createdAt: new Date() },
-    ],
-  };
+type Props = {
+  room: IRoom;
+};
 
-  const imgUrl = `https://picsum.photos/640/480?random=${Math.floor(
-    Math.random() * 1000
-  )}`;
-
+export default function Room({ room }: Props) {
+  const { data: session } = useSession();
   const router = useRouter();
 
   const onClick = () => {
-    router.push(`/messages/${user.Messages.at(-1)?.roomId}`);
+    router.push(`/messages/${room.room}`);
   };
+
+  const user =
+    room.Receiver.id === session?.user?.email ? room.Sender : room.Receiver;
 
   return (
     <div className={style.room} onClick={onClick}>
       <div className={style.roomUserImage}>
-        <img src={imgUrl} alt="" />
+        <img src={user.image} alt="" />
       </div>
       <div className={style.roomChatInfo}>
         <div className={style.roomUserInfo}>
@@ -40,12 +37,10 @@ export default function Room() {
           <span>@{user.id}</span>
           &nbsp; · &nbsp;
           <span className={style.postDate}>
-            {dayjs(user.Messages?.at(-1)?.createdAt).fromNow(true)}
+            {dayjs(room.createdAt).fromNow(true)}
           </span>
         </div>
-        <div className={style.roomLastChat}>
-          {user.Messages?.at(-1)?.content}
-        </div>
+        <div className={style.roomLastChat}>{room.content}</div>
       </div>
     </div>
   );

@@ -96,20 +96,26 @@ export default function PostForm({ me }: Props) {
   const onUpload: ChangeEventHandler<HTMLInputElement> = (e) => {
     e.preventDefault();
     if (e.target.files) {
-      Array.from(e.target.files).forEach((file, index) => {
+      const newFiles = Array.from(e.target.files);
+      const tempPreviews: Array<{ dataUrl: string; file: File }> = [];
+      newFiles.forEach((file) => {
         const reader = new FileReader();
         reader.onloadend = () => {
-          setPreview((prevPreview) => {
-            const prev = [...prevPreview];
-            prev[index] = {
-              dataUrl: reader.result as string,
-              file,
-            };
-            return prev;
+          tempPreviews.push({
+            dataUrl: reader.result as string,
+            file,
           });
+          //readAsDataURL는 비동기 작업임
+          if (tempPreviews.length === newFiles.length) {
+            setPreview((prev) => [...prev, ...tempPreviews]);
+          }
         };
         reader.readAsDataURL(file);
       });
+    }
+    if (imageRef.current) {
+      //같은걸 연속으로 선택할 수 있게끔
+      imageRef.current.value = "";
     }
   };
 
